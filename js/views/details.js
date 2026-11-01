@@ -1,5 +1,5 @@
 import { getTournament, saveTournament, deleteTournament } from '../storage.js';
-import { h, iconButton, icon, titleBar, confirmDialog, navigate, FORMAT_LABELS } from '../ui.js';
+import { h, appendChildren, iconButton, icon, titleBar, confirmDialog, navigate, FORMAT_LABELS } from '../ui.js';
 import { computeLeaderboard, formatDiff, isFinished, isRoundComplete, hasScore } from '../ranking.js';
 import { leaderboardCsv, matchesCsv, leaderboardText, exportFileName, downloadCsv } from '../export.js';
 
@@ -106,7 +106,8 @@ export function renderDetails(root, id, initialTab) {
     const played = t.rounds.flat().filter(hasScore).length;
     const total = t.rounds.flat().length;
 
-    content.append(
+    appendChildren(content, [
+      isFinished(t) ? winnerBanner(rows) : null,
       h('div', { class: 'leaderboard-meta' },
         h('span', {}, FORMAT_LABELS[t.format]),
         h('span', {}, `${played} / ${total} matches played`),
@@ -145,6 +146,25 @@ export function renderDetails(root, id, initialTab) {
           : `${t.points.perRound} points per round.`,
       ),
       isFinished(t) ? exportActions() : null,
+    ]);
+  }
+
+  function winnerBanner(rows) {
+    // Rows only share rank 1 if all ranking metrics are equal, so the stats hold for every winner.
+    const winners = rows.filter((r) => r.rank === 1);
+    const [{ wonPoints, wins, ties, losses }] = winners;
+    const tied = winners.length > 1;
+
+    return h('section', { class: 'winner-banner' },
+      h('img', { class: 'winner-trophy', src: 'assets/trophy.svg', alt: '', width: 128, height: 128 }),
+      h('p', { class: 'winner-label' }, tied ? 'Joint winners' : 'Winner'),
+      h('h2', { class: 'winner-name' }, `Congratulations, ${winners.map((r) => r.name).join(' & ')}!`),
+      t.format === 'team'
+        ? winners.map((r) =>
+            h('p', { class: 'muted small' }, `${tied ? `${r.name}: ` : ''}${r.members.join(' & ')}`))
+        : null,
+      h('p', { class: 'winner-stats' },
+        `${wonPoints} ${wonPoints === 1 ? 'point' : 'points'} · ${wins}W ${ties}T ${losses}L`),
     );
   }
 

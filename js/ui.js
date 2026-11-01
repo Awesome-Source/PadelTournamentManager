@@ -26,7 +26,7 @@ export function h(tag, props = {}, ...children) {
   return el;
 }
 
-function appendChildren(el, children) {
+export function appendChildren(el, children) {
   for (const child of children) {
     if (child === null || child === undefined || child === false) continue;
     if (Array.isArray(child)) appendChildren(el, child);

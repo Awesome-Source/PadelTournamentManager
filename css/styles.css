@@ -832,6 +832,46 @@ button {
 
 /* ---------- Leaderboard ---------- */
 
+.winner-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 20px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.winner-banner p,
+.winner-banner h2 {
+  margin: 0;
+}
+
+.winner-trophy {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.winner-label {
+  color: var(--gold);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.winner-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.winner-stats {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .leaderboard-meta {
   display: flex;
   justify-content: space-between;

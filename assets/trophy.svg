@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <clipPath id="ball">
+      <circle cx="32" cy="32" r="20"/>
+    </clipPath>
+    <clipPath id="racket-head">
+      <path d="M0 -24C12.5 -24 22.8 -15 22.8 -4C22.8 2 20.5 5 18.5 8.5C14 16 8 25 3.4 34H-3.4C-8 25 -14 16 -18.5 8.5C-20.5 5 -22.8 2 -22.8 -4C-22.8 -15 -12.5 -24 0 -24Z"/>
+    </clipPath>
+    <clipPath id="cup">
+      <path d="M50 62H94C94 84 84 94 72 94C60 94 50 84 50 62Z"/>
+    </clipPath>
+    <clipPath id="foot">
+      <path d="M68 92H76V100C76 102 78 103 81 103H85C87 103 88 104 88 106V110H56V106C56 104 57 103 59 103H63C66 103 68 102 68 100Z"/>
+    </clipPath>
+  </defs>
+  <polygon points="64,14 107.3,39 107.3,89 64,114 20.7,89 20.7,39" fill="#0f2557" stroke="#0f2557" stroke-width="24" stroke-linejoin="round"/>
+
+  <!-- Trail of the ball, starting at the racket face -->
+  <path d="M67 37L100 24L102 37Z" fill="#f6f04a"/>
+  <g fill="#bfdc3e">
+    <path d="M70 45L100 35L102 40Z"/>
+    <path d="M72 28L99 16L101 21Z"/>
+  </g>
+
+  <!-- Padel racket -->
+  <g transform="translate(49 46) rotate(38) scale(0.9)">
+    <path d="M-3.2 33H3.2L3.4 53C3.4 54 4 55 4 56C4 57 3.2 57.5 2.5 57.5H-2.5C-3.2 57.5 -4 57 -4 56C-4 55 -3.4 54 -3.4 53Z" fill="#ffffff"/>
+    <g clip-path="url(#racket-head)">
+      <rect x="-24" y="-25" width="48" height="60" fill="#ee4f42"/>
+      <circle cx="-3" cy="-7" r="23" fill="#ff6f5c"/>
+      <path d="M26 2.2L-26 34V40H26Z" fill="#12796f"/>
+    </g>
+    <g fill="#0f2557">
+      <path d="M-8.5 20C-4 22 4 22 8.5 20C6 25 -6 25 -8.5 20Z"/>
+      <path d="M-3.6 26H3.6L0 30.5Z" stroke="#0f2557" stroke-width="0.8" stroke-linejoin="round"/>
+      <circle cx="-9" cy="-18" r="1.1"/>
+      <circle cx="-3" cy="-18" r="1.1"/>
+      <circle cx="3" cy="-18" r="1.1"/>
+      <circle cx="9" cy="-18" r="1.1"/>
+      <circle cx="-12" cy="-14" r="1.1"/>
+      <circle cx="-6" cy="-14" r="1.1"/>
+      <circle cx="0" cy="-14" r="1.1"/>
+      <circle cx="6" cy="-14" r="1.1"/>
+      <circle cx="12" cy="-14" r="1.1"/>
+      <circle cx="-15" cy="-10" r="1.1"/>
+      <circle cx="-9" cy="-10" r="1.1"/>
+      <circle cx="-3" cy="-10" r="1.1"/>
+      <circle cx="3" cy="-10" r="1.1"/>
+      <circle cx="9" cy="-10" r="1.1"/>
+      <circle cx="15" cy="-10" r="1.1"/>
+      <circle cx="-18" cy="-6" r="1.1"/>
+      <circle cx="-12" cy="-6" r="1.1"/>
+      <circle cx="-6" cy="-6" r="1.1"/>
+      <circle cx="0" cy="-6" r="1.1"/>
+      <circle cx="6" cy="-6" r="1.1"/>
+      <circle cx="12" cy="-6" r="1.1"/>
+      <circle cx="18" cy="-6" r="1.1"/>
+      <circle cx="-15" cy="-2" r="1.1"/>
+      <circle cx="-9" cy="-2" r="1.1"/>
+      <circle cx="-3" cy="-2" r="1.1"/>
+      <circle cx="3" cy="-2" r="1.1"/>
+      <circle cx="9" cy="-2" r="1.1"/>
+      <circle cx="15" cy="-2" r="1.1"/>
+      <circle cx="-12" cy="2" r="1.1"/>
+      <circle cx="-6" cy="2" r="1.1"/>
+      <circle cx="0" cy="2" r="1.1"/>
+      <circle cx="6" cy="2" r="1.1"/>
+      <circle cx="12" cy="2" r="1.1"/>
+      <circle cx="-15" cy="6" r="1.1"/>
+      <circle cx="-9" cy="6" r="1.1"/>
+      <circle cx="-3" cy="6" r="1.1"/>
+      <circle cx="3" cy="6" r="1.1"/>
+      <circle cx="9" cy="6" r="1.1"/>
+      <circle cx="-12" cy="10" r="1.1"/>
+      <circle cx="-6" cy="10" r="1.1"/>
+      <circle cx="0" cy="10" r="1.1"/>
+      <circle cx="6" cy="10" r="1.1"/>
+      <circle cx="-9" cy="14" r="1.1"/>
+      <circle cx="-3" cy="14" r="1.1"/>
+      <circle cx="3" cy="14" r="1.1"/>
+    </g>
+  </g>
+
+  <!-- Trophy, the navy outline keeps it apart from the racket behind it -->
+  <g fill="none" stroke="#0f2557" stroke-width="10" stroke-linecap="round">
+    <path d="M51 67H42C42 79 49 84 56 85"/>
+    <path d="M93 67H102C102 79 95 84 88 85"/>
+  </g>
+  <path d="M50 62H94C94 84 84 94 72 94C60 94 50 84 50 62Z" fill="#0f2557" stroke="#0f2557" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M68 92H76V100C76 102 78 103 81 103H85C87 103 88 104 88 106V110H56V106C56 104 57 103 59 103H63C66 103 68 102 68 100Z" fill="#0f2557" stroke="#0f2557" stroke-width="6" stroke-linejoin="round"/>
+  <g fill="none" stroke="#d9a406" stroke-width="4.5" stroke-linecap="round">
+    <path d="M51 67H42C42 79 49 84 56 85"/>
+    <path d="M93 67H102C102 79 95 84 88 85"/>
+  </g>
+  <g clip-path="url(#foot)">
+    <rect x="50" y="90" width="44" height="22" fill="#d9a406"/>
+    <rect x="46" y="88" width="34" height="24" fill="#fbcb2d"/>
+  </g>
+  <g clip-path="url(#cup)">
+    <rect x="46" y="58" width="52" height="40" fill="#d9a406"/>
+    <circle cx="67" cy="60" r="29" fill="#fbcb2d"/>
+    <g fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round">
+      <path d="M58 58C62 70 62 82 66 96"/>
+      <path d="M86 58C82 70 82 82 78 96"/>
+    </g>
+  </g>
+
+  <!-- Tennis ball, same drawing as the logo -->
+  <g transform="translate(83.2 9.2) scale(0.65)">
+    <circle cx="32" cy="32" r="20" fill="#0f2557" stroke="#0f2557" stroke-width="6"/>
+    <g clip-path="url(#ball)">
+      <circle cx="32" cy="32" r="20" fill="#bfdc3e"/>
+      <circle cx="28.5" cy="28.5" r="20" fill="#f6f04a"/>
+      <g transform="rotate(-30 32 32)" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round">
+        <path d="M14.2 9.8C26.45 20.9 26.45 43.1 14.2 54.2"/>
+        <path d="M49.8 9.8C37.55 20.9 37.55 43.1 49.8 54.2"/>
+      </g>
+    </g>
+  </g>
+</svg>
