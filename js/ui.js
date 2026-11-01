@@ -81,9 +81,9 @@ export function titleBar({ title, left = null, right = [] }) {
 export function radioGroup({ name, legend, options, value, onChange }) {
   return h('fieldset', { class: 'fieldset' },
     h('legend', { class: 'field-label' }, legend),
-    h('div', { class: 'segmented' },
+    h('div', { class: 'radio-list' },
       options.map((o) =>
-        h('label', { class: 'segment' },
+        h('label', { class: 'radio-row' },
           h('input', {
             type: 'radio',
             name,
@@ -91,7 +91,7 @@ export function radioGroup({ name, legend, options, value, onChange }) {
             checked: value === o.value,
             onChange: () => onChange(o.value),
           }),
-          h('span', {}, o.label),
+          h('span', { class: 'radio-label' }, o.label),
         ),
       ),
     ),

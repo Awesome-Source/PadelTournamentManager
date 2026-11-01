@@ -383,7 +383,7 @@ export function renderWizard(root) {
     }
 
     const modeCard = (mode, title, description, inputs) => {
-      cards[mode] = h('div', { class: `choice-card choice-card-static ${draft.points.mode === mode ? 'selected' : ''}`, onClick: () => selectMode(mode) },
+      cards[mode] = h('div', { class: `choice-card ${draft.points.mode === mode ? 'selected' : ''}`, onClick: () => selectMode(mode) },
         h('label', { class: 'radio-row' },
           h('input', { type: 'radio', name: 'points-mode', value: mode, checked: draft.points.mode === mode, onChange: () => selectMode(mode) }),
           h('span', { class: 'choice-title' }, title),
@@ -400,16 +400,18 @@ export function renderWizard(root) {
     });
 
     body.append(
-      h('h2', { class: 'section-title' }, tr('wizard.pointsTitle')),
-      h('div', { class: 'choice-list' },
-        modeCard('perRound', tr('wizard.perRoundTitle'), tr('wizard.perRoundDescription'), [
-          numberInput('perRound', tr('wizard.perRoundInput'), 1),
-        ]),
-        modeCard('wtl', tr('wizard.wtlTitle'), tr('wizard.wtlDescription'), [
-          numberInput('win', tr('wizard.win'), 0),
-          numberInput('tie', tr('wizard.tie'), 0),
-          numberInput('loss', tr('wizard.loss'), 0),
-        ]),
+      h('fieldset', { class: 'fieldset' },
+        h('legend', {}, h('h2', { class: 'section-title' }, tr('wizard.pointsTitle'))),
+        h('div', { class: 'choice-list' },
+          modeCard('perRound', tr('wizard.perRoundTitle'), tr('wizard.perRoundDescription'), [
+            numberInput('perRound', tr('wizard.perRoundInput'), 1),
+          ]),
+          modeCard('wtl', tr('wizard.wtlTitle'), tr('wizard.wtlDescription'), [
+            numberInput('win', tr('wizard.win'), 0),
+            numberInput('tie', tr('wizard.tie'), 0),
+            numberInput('loss', tr('wizard.loss'), 0),
+          ]),
+        ),
       ),
       error,
       nav.bar,

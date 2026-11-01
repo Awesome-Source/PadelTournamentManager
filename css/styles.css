@@ -505,56 +505,18 @@ button {
   padding: 0;
 }
 
-.segmented {
+.radio-list {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  flex-direction: column;
 }
 
-.segment {
-  position: relative;
-  flex: 1 1 140px;
-}
-
-.segment input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.segment span {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.radio-list .radio-row {
   min-height: 44px;
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
-  text-align: center;
+  padding: 10px 0;
+}
+
+.radio-label {
   font-weight: 550;
-  cursor: pointer;
-  transition: border-color 0.15s, background-color 0.15s;
-}
-
-.segment span:hover {
-  border-color: var(--primary);
-}
-
-.segment input:checked + span {
-  border-color: var(--primary);
-  background: var(--primary-soft);
-  color: var(--primary);
-}
-
-:root[data-theme="dark"] .segment input:checked + span {
-  color: #ffffff;
-  background: var(--primary);
-}
-
-.segment input:focus-visible + span {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
 }
 
 /* ---------- Wizard ---------- */
@@ -632,6 +594,14 @@ button {
   max-width: 220px;
 }
 
+.wizard > .fieldset:first-child {
+  margin-top: 0;
+}
+
+.wizard > .fieldset:first-child legend {
+  margin-bottom: 0;
+}
+
 .choice-list {
   display: flex;
   flex-direction: column;
@@ -650,6 +620,7 @@ button {
   border-radius: 14px;
   box-shadow: var(--shadow);
   transition: border-color 0.15s, background-color 0.15s;
+  cursor: pointer;
 }
 
 .choice-card:hover {
@@ -659,10 +630,6 @@ button {
 .choice-card.selected {
   border-color: var(--primary);
   background: var(--primary-soft);
-}
-
-.choice-card-static {
-  cursor: pointer;
 }
 
 .choice-title {
@@ -677,16 +644,18 @@ button {
 
 .radio-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   cursor: pointer;
 }
 
 .radio-row input {
+  flex-shrink: 0;
   width: 18px;
   height: 18px;
-  margin: 0;
+  margin: 3px 0 0;
   accent-color: var(--primary);
+  cursor: pointer;
 }
 
 .add-row {
