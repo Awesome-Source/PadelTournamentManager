@@ -57,12 +57,15 @@ export function iconButton(name, label, onClick, extraClass = '') {
 }
 
 /**
- * Title bar with optional left element, title and right-side elements.
+ * Title bar with optional left element, app logo, title and right-side elements.
  */
 export function titleBar({ title, left = null, right = [] }) {
   return h('header', { class: 'title-bar' },
     h('div', { class: 'title-bar-inner' },
-      left ? h('div', { class: 'title-bar-left' }, left) : null,
+      h('div', { class: 'title-bar-left' },
+        left,
+        h('img', { class: 'title-bar-logo', src: 'assets/logo.svg', alt: '', width: 36, height: 36 }),
+      ),
       h('h1', { class: 'title-bar-title' }, title),
       h('div', { class: 'title-bar-right' }, right),
     ),

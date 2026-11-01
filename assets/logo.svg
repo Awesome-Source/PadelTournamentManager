@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <clipPath id="ball">
+      <circle cx="32" cy="32" r="20"/>
+    </clipPath>
+  </defs>
+  <polygon points="32,7 53.65,19.5 53.65,44.5 32,57 10.35,44.5 10.35,19.5" fill="#0f2557" stroke="#0f2557" stroke-width="12" stroke-linejoin="round"/>
+  <g clip-path="url(#ball)">
+    <circle cx="32" cy="32" r="20" fill="#bfdc3e"/>
+    <circle cx="28.5" cy="28.5" r="20" fill="#f6f04a"/>
+    <g transform="rotate(-30 32 32)" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round">
+      <path d="M14.2 9.8C26.45 20.9 26.45 43.1 14.2 54.2"/>
+      <path d="M49.8 9.8C37.55 20.9 37.55 43.1 49.8 54.2"/>
+    </g>
+  </g>
+</svg>

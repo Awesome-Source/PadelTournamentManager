@@ -152,6 +152,11 @@ button {
   gap: 6px;
 }
 
+.title-bar-logo {
+  display: block;
+  flex-shrink: 0;
+}
+
 .icon-btn {
   display: inline-flex;
   align-items: center;
