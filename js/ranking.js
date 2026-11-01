@@ -15,6 +15,10 @@ export function isFinished(tournament) {
   return matches.length > 0 && matches.every(hasScore);
 }
 
+export function formatDiff(diff) {
+  return diff > 0 ? `+${diff}` : String(diff);
+}
+
 const METRIC_KEYS = {
   points: 'wonPoints',
   wins: 'wins',

@@ -1,6 +1,7 @@
 import { getTournament, saveTournament, deleteTournament } from '../storage.js';
 import { h, iconButton, icon, titleBar, confirmDialog, navigate, FORMAT_LABELS } from '../ui.js';
-import { computeLeaderboard, isFinished, isRoundComplete, hasScore } from '../ranking.js';
+import { computeLeaderboard, formatDiff, isFinished, isRoundComplete, hasScore } from '../ranking.js';
+import { leaderboardCsv, matchesCsv, leaderboardText, exportFileName, downloadCsv } from '../export.js';
 
 const RANK_LABELS = { points: 'Won points', wins: 'Number of wins', diff: 'Point difference' };
 
@@ -103,7 +104,6 @@ export function renderDetails(root, id, initialTab) {
     const isTeam = t.format === 'team';
     const pointsLabel = t.points.mode === 'wtl' ? 'Pts' : 'Won';
     const highlight = (key) => (t.rankMode === key ? 'col-highlight' : '');
-    const formatDiff = (d) => (d > 0 ? `+${d}` : String(d));
     const played = t.rounds.flat().filter(hasScore).length;
     const total = t.rounds.flat().length;
 
@@ -151,6 +151,31 @@ export function renderDetails(root, id, initialTab) {
           ? `Win ${t.points.win} · Tie ${t.points.tie} · Loss ${t.points.loss} points.`
           : `${t.points.perRound} points per round.`,
       ),
+      isFinished(t) ? exportActions() : null,
+    );
+  }
+
+  function exportActions() {
+    const actionButton = (iconName, label, onClick) =>
+      h('button', { type: 'button', class: 'btn btn-secondary btn-small', onClick }, icon(iconName), label);
+
+    const copyLabel = h('span', {}, 'Copy leaderboard');
+    let resetTimer;
+    const copy = async () => {
+      try {
+        await navigator.clipboard.writeText(leaderboardText(t));
+        copyLabel.textContent = 'Copied!';
+      } catch {
+        copyLabel.textContent = 'Copy failed';
+      }
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(() => { copyLabel.textContent = 'Copy leaderboard'; }, 2000);
+    };
+
+    return h('div', { class: 'leaderboard-export' },
+      actionButton('download', 'Leaderboard CSV', () => downloadCsv(exportFileName(t, 'leaderboard'), leaderboardCsv(t))),
+      actionButton('download', 'Matches CSV', () => downloadCsv(exportFileName(t, 'matches'), matchesCsv(t))),
+      actionButton('copy', copyLabel, copy),
     );
   }
 

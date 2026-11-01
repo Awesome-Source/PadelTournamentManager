@@ -898,6 +898,13 @@ button {
   margin-top: 12px;
 }
 
+.leaderboard-export {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
 /* ---------- Rounds / matches ---------- */
 
 .round-head {

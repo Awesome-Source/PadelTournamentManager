@@ -11,6 +11,7 @@ A static web app for running padel **Americano** tournaments. It has no backend:
   - "Points per round": the other score fills in automatically so the two always add up to the round total.
   - "Win / Tie / Loss points".
 - **Live leaderboard.** Choose the rank mode (won points, number of wins or point difference) and a tie break rule.
+- **Export for finished tournaments.** Download the leaderboard or all matches as CSV, or copy the leaderboard as plain text to paste into a messenger.
 - **Dark mode** (default) and **light mode**.
 
 ## Run locally
