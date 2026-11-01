@@ -102,7 +102,6 @@ export function renderDetails(root, id, initialTab) {
   function renderLeaderboard() {
     const rows = computeLeaderboard(t);
     const isTeam = t.format === 'team';
-    const pointsLabel = t.points.mode === 'wtl' ? 'Pts' : 'Won';
     const highlight = (key) => (t.rankMode === key ? 'col-highlight' : '');
     const played = t.rounds.flat().filter(hasScore).length;
     const total = t.rounds.flat().length;
@@ -118,11 +117,8 @@ export function renderDetails(root, id, initialTab) {
             h('tr', {},
               h('th', { class: 'col-num' }, '#'),
               h('th', {}, isTeam ? 'Team' : 'Player'),
-              h('th', { class: 'col-stat', title: 'Matches played' }, 'P'),
-              h('th', { class: `col-stat ${highlight('wins')}`, title: 'Wins' }, 'W'),
-              h('th', { class: 'col-stat', title: 'Ties' }, 'T'),
-              h('th', { class: 'col-stat', title: 'Losses' }, 'L'),
-              h('th', { class: `col-stat ${highlight('points')}`, title: t.points.mode === 'wtl' ? 'Points from wins / ties / losses' : 'Won points' }, pointsLabel),
+              h('th', { class: `col-stat ${highlight('wins')}`, title: 'Wins / ties / losses' }, 'W/T/L'),
+              h('th', { class: `col-stat ${highlight('points')}`, title: t.points.mode === 'wtl' ? 'Points from wins / ties / losses' : 'Won points' }, 'Points'),
               h('th', { class: `col-stat ${highlight('diff')}`, title: 'Point difference' }, '+/−'),
             ),
           ),
@@ -134,10 +130,7 @@ export function renderDetails(root, id, initialTab) {
                   h('div', { class: 'lb-name' }, r.name),
                   isTeam ? h('div', { class: 'lb-members muted' }, r.members.join(' & ')) : null,
                 ),
-                h('td', { class: 'col-stat' }, String(r.played)),
-                h('td', { class: `col-stat ${highlight('wins')}` }, String(r.wins)),
-                h('td', { class: 'col-stat' }, String(r.ties)),
-                h('td', { class: 'col-stat' }, String(r.losses)),
+                h('td', { class: `col-stat ${highlight('wins')}` }, `${r.wins}/${r.ties}/${r.losses}`),
                 h('td', { class: `col-stat ${highlight('points')}` }, String(r.wonPoints)),
                 h('td', { class: `col-stat ${highlight('diff')}` }, formatDiff(r.diff)),
               ),

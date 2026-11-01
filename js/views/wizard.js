@@ -21,7 +21,7 @@ function newDraft() {
     format: null,
     players: [],
     teams: [],
-    points: { mode: 'perRound', perRound: '24', win: '3', tie: '1', loss: '0' },
+    points: { mode: 'perRound', perRound: '32', win: '3', tie: '1', loss: '0' },
     title: `Americano ${new Date().toLocaleDateString()}`,
     rankMode: 'points',
     tieBreak: 'diff',
