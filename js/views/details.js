@@ -1,19 +1,18 @@
 import { getTournament, saveTournament, deleteTournament } from '../storage.js';
-import { h, appendChildren, iconButton, icon, titleBar, confirmDialog, navigate, FORMAT_LABELS } from '../ui.js';
+import { tr } from '../i18n.js';
+import { h, appendChildren, iconButton, icon, titleBar, confirmDialog, navigate } from '../ui.js';
 import { computeLeaderboard, formatDiff, isFinished, isRoundComplete, hasScore } from '../ranking.js';
 import { leaderboardCsv, matchesCsv, leaderboardText, exportFileName, downloadCsv } from '../export.js';
-
-const RANK_LABELS = { points: 'Won points', wins: 'Number of wins', diff: 'Point difference' };
 
 export function renderDetails(root, id, initialTab) {
   const t = getTournament(id);
   if (!t) {
     root.append(
-      titleBar({ title: 'Tournament', left: iconButton('back', 'Back to tournaments', () => navigate('#/')) }),
+      titleBar({ title: tr('details.fallbackTitle'), left: iconButton('back', tr('common.backToTournaments'), () => navigate('#/')) }),
       h('main', { class: 'content' },
         h('div', { class: 'empty-state' },
-          h('p', { class: 'empty-title' }, 'Tournament not found'),
-          h('button', { type: 'button', class: 'btn btn-primary', onClick: () => navigate('#/') }, 'Back to tournaments'),
+          h('p', { class: 'empty-title' }, tr('details.notFound')),
+          h('button', { type: 'button', class: 'btn btn-primary', onClick: () => navigate('#/') }, tr('common.backToTournaments')),
         ),
       ),
     );
@@ -33,8 +32,8 @@ export function renderDetails(root, id, initialTab) {
   root.append(
     titleBar({
       title: t.title,
-      left: iconButton('back', 'Back to tournaments', () => navigate('#/')),
-      right: [stateBadge, iconButton('trash', 'Delete tournament', remove, 'icon-btn-danger')],
+      left: iconButton('back', tr('common.backToTournaments'), () => navigate('#/')),
+      right: [stateBadge, iconButton('trash', tr('details.delete'), remove, 'icon-btn-danger')],
     }),
     h('nav', { class: 'tab-bar', role: 'tablist' },
       h('div', { class: 'tab-bar-inner' },
@@ -45,7 +44,7 @@ export function renderDetails(root, id, initialTab) {
             role: 'tab',
             onClick: () => selectTab(key),
           },
-            key === 'lb' ? 'Leaderboard' : `R${i}`,
+            key === 'lb' ? tr('details.leaderboardTab') : tr('details.roundTab', { number: i }),
             key === 'lb' ? null : h('span', { class: 'tab-check' }, icon('check')),
           );
           tabButtons.set(key, button);
@@ -58,9 +57,9 @@ export function renderDetails(root, id, initialTab) {
 
   async function remove() {
     const confirmed = await confirmDialog({
-      title: 'Delete tournament?',
-      message: `"${t.title}" and all its results will be deleted permanently.`,
-      okLabel: 'Delete',
+      title: tr('details.deleteTitle'),
+      message: tr('details.deleteMessage', { title: t.title }),
+      okLabel: tr('details.deleteConfirm'),
     });
     if (confirmed) {
       deleteTournament(t.id);
@@ -77,7 +76,7 @@ export function renderDetails(root, id, initialTab) {
 
   function updateIndicators() {
     const finished = isFinished(t);
-    stateBadge.textContent = finished ? 'Finished' : 'Open';
+    stateBadge.textContent = tr(finished ? 'status.finished' : 'status.open');
     stateBadge.className = `badge ${finished ? 'badge-finished' : 'badge-open'}`;
     t.rounds.forEach((round, i) => {
       tabButtons.get(`r${i + 1}`).classList.toggle('complete', isRoundComplete(round));
@@ -109,18 +108,18 @@ export function renderDetails(root, id, initialTab) {
     appendChildren(content, [
       isFinished(t) ? winnerBanner(rows) : null,
       h('div', { class: 'leaderboard-meta' },
-        h('span', {}, FORMAT_LABELS[t.format]),
-        h('span', {}, `${played} / ${total} matches played`),
+        h('span', {}, tr(`format.${t.format}`)),
+        h('span', {}, tr('details.matchesPlayed', { played, total })),
       ),
       h('div', { class: 'table-wrap card' },
         h('table', { class: 'table leaderboard' },
           h('thead', {},
             h('tr', {},
               h('th', { class: 'col-num' }, '#'),
-              h('th', {}, isTeam ? 'Team' : 'Player'),
-              h('th', { class: `col-stat ${highlight('wins')}`, title: 'Wins / ties / losses' }, 'W/T/L'),
-              h('th', { class: `col-stat ${highlight('points')}`, title: t.points.mode === 'wtl' ? 'Points from wins / ties / losses' : 'Won points' }, 'Points'),
-              h('th', { class: `col-stat ${highlight('diff')}`, title: 'Point difference' }, '+/−'),
+              h('th', {}, tr(isTeam ? 'common.team' : 'common.player')),
+              h('th', { class: `col-stat ${highlight('wins')}`, title: tr('details.columnRecordHint') }, tr('details.columnRecord')),
+              h('th', { class: `col-stat ${highlight('points')}`, title: t.points.mode === 'wtl' ? tr('details.columnPointsWtlHint') : tr('rank.points') }, tr('details.columnPoints')),
+              h('th', { class: `col-stat ${highlight('diff')}`, title: tr('rank.diff') }, tr('details.columnDiff')),
             ),
           ),
           h('tbody', {},
@@ -140,10 +139,10 @@ export function renderDetails(root, id, initialTab) {
         ),
       ),
       h('p', { class: 'muted small leaderboard-note' },
-        `Ranked by ${RANK_LABELS[t.rankMode]}, tie break: ${RANK_LABELS[t.tieBreak]}. `,
+        tr('details.rankingNote', { rank: tr(`rank.${t.rankMode}`), tieBreak: tr(`rank.${t.tieBreak}`) }),
         t.points.mode === 'wtl'
-          ? `Win ${t.points.win} · Tie ${t.points.tie} · Loss ${t.points.loss} points.`
-          : `${t.points.perRound} points per round.`,
+          ? tr('details.pointsNoteWtl', { win: t.points.win, tie: t.points.tie, loss: t.points.loss })
+          : tr('details.pointsNotePerRound', { perRound: t.points.perRound }),
       ),
       isFinished(t) ? exportActions() : null,
     ]);
@@ -157,14 +156,14 @@ export function renderDetails(root, id, initialTab) {
 
     return h('section', { class: 'winner-banner' },
       h('img', { class: 'winner-trophy', src: 'assets/trophy.svg', alt: '', width: 128, height: 128 }),
-      h('p', { class: 'winner-label' }, tied ? 'Joint winners' : 'Winner'),
-      h('h2', { class: 'winner-name' }, `Congratulations, ${winners.map((r) => r.name).join(' & ')}!`),
+      h('p', { class: 'winner-label' }, tr(tied ? 'details.jointWinners' : 'details.winner')),
+      h('h2', { class: 'winner-name' }, tr('details.congratulations', { names: winners.map((r) => r.name).join(' & ') })),
       t.format === 'team'
         ? winners.map((r) =>
             h('p', { class: 'muted small' }, `${tied ? `${r.name}: ` : ''}${r.members.join(' & ')}`))
         : null,
       h('p', { class: 'winner-stats' },
-        `${wonPoints} ${wonPoints === 1 ? 'point' : 'points'} · ${wins}W ${ties}T ${losses}L`),
+        `${tr('results.points', { count: wonPoints })} · ${tr('results.record', { wins, ties, losses })}`),
     );
   }
 
@@ -172,22 +171,22 @@ export function renderDetails(root, id, initialTab) {
     const actionButton = (iconName, label, onClick) =>
       h('button', { type: 'button', class: 'btn btn-secondary btn-small', onClick }, icon(iconName), label);
 
-    const copyLabel = h('span', {}, 'Copy leaderboard');
+    const copyLabel = h('span', {}, tr('export.copy'));
     let resetTimer;
     const copy = async () => {
       try {
         await navigator.clipboard.writeText(leaderboardText(t));
-        copyLabel.textContent = 'Copied!';
+        copyLabel.textContent = tr('export.copied');
       } catch {
-        copyLabel.textContent = 'Copy failed';
+        copyLabel.textContent = tr('export.copyFailed');
       }
       clearTimeout(resetTimer);
-      resetTimer = setTimeout(() => { copyLabel.textContent = 'Copy leaderboard'; }, 2000);
+      resetTimer = setTimeout(() => { copyLabel.textContent = tr('export.copy'); }, 2000);
     };
 
     return h('div', { class: 'leaderboard-export' },
-      actionButton('download', 'Leaderboard CSV', () => downloadCsv(exportFileName(t, 'leaderboard'), leaderboardCsv(t))),
-      actionButton('download', 'Matches CSV', () => downloadCsv(exportFileName(t, 'matches'), matchesCsv(t))),
+      actionButton('download', tr('export.leaderboardCsv'), () => downloadCsv(exportFileName(t, tr('export.fileLeaderboard')), leaderboardCsv(t))),
+      actionButton('download', tr('export.matchesCsv'), () => downloadCsv(exportFileName(t, tr('export.fileMatches')), matchesCsv(t))),
       actionButton('copy', copyLabel, copy),
     );
   }
@@ -198,8 +197,8 @@ export function renderDetails(root, id, initialTab) {
     const round = t.rounds[index];
     content.append(
       h('div', { class: 'round-head' },
-        h('h2', { class: 'section-title' }, `Round ${index + 1}`),
-        h('span', { class: 'muted small' }, `${round.length} ${round.length === 1 ? 'match' : 'matches'}`),
+        h('h2', { class: 'section-title' }, tr('details.round', { number: index + 1 })),
+        h('span', { class: 'muted small' }, tr('details.matchCount', { count: round.length })),
       ),
       h('div', { class: 'card-list' }, round.map((match, i) => matchCard(match, i))),
     );
@@ -208,8 +207,10 @@ export function renderDetails(root, id, initialTab) {
   function matchCard(match, index) {
     const isTeam = t.format === 'team';
     const perRound = t.points.mode === 'perRound' ? t.points.perRound : null;
-    const name1 = isTeam ? teamNames.get(match.team1Id) || 'Team 1' : 'Team 1';
-    const name2 = isTeam ? teamNames.get(match.team2Id) || 'Team 2' : 'Team 2';
+    const fallback1 = tr('common.teamNumber', { number: 1 });
+    const fallback2 = tr('common.teamNumber', { number: 2 });
+    const name1 = isTeam ? teamNames.get(match.team1Id) || fallback1 : fallback1;
+    const name2 = isTeam ? teamNames.get(match.team2Id) || fallback2 : fallback2;
 
     const scoreInput = (key, label) =>
       h('input', {
@@ -226,8 +227,8 @@ export function renderDetails(root, id, initialTab) {
         onInput: () => onScoreInput(key),
       });
 
-    const input1 = scoreInput('score1', `Score ${name1}`);
-    const input2 = scoreInput('score2', `Score ${name2}`);
+    const input1 = scoreInput('score1', tr('details.scoreLabel', { name: name1 }));
+    const input2 = scoreInput('score2', tr('details.scoreLabel', { name: name2 }));
     const card = h('article', { class: 'card match-card' });
 
     function onScoreInput(key) {
@@ -276,7 +277,7 @@ export function renderDetails(root, id, initialTab) {
     const side2Name = h('div', { class: 'match-team right' }, name2);
 
     card.append(
-      h('div', { class: 'match-label muted small' }, `Match ${index + 1}`),
+      h('div', { class: 'match-label muted small' }, tr('details.match', { number: index + 1 })),
       h('div', { class: 'match-header match-grid' },
         side1Name,
         h('div', { class: 'match-score' }, input1, h('span', { class: 'score-sep' }, ':'), input2),
@@ -284,7 +285,7 @@ export function renderDetails(root, id, initialTab) {
       ),
       h('div', { class: 'match-body match-grid' },
         playerList(match.side1, 'left'),
-        h('div', { class: 'match-vs' }, 'VS'),
+        h('div', { class: 'match-vs' }, tr('details.versus')),
         playerList(match.side2, 'right'),
       ),
     );

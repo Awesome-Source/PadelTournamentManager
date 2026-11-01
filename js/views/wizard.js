@@ -1,19 +1,13 @@
 import { loadDraft, saveDraft, clearDraft, saveTournament, uid } from '../storage.js';
-import { h, icon, iconButton, titleBar, confirmDialog, navigate, FORMAT_LABELS } from '../ui.js';
+import { currentLanguage, tr } from '../i18n.js';
+import { h, icon, iconButton, titleBar, confirmDialog, navigate, radioGroup } from '../ui.js';
 import { generateClassicSchedule, generateTeamSchedule } from '../schedule.js';
 
-const STEPS = ['Format', 'Players', 'Points', 'Settings'];
+const STEPS = ['wizard.stepFormat', 'wizard.stepPlayers', 'wizard.stepPoints', 'wizard.stepSettings'];
 
-const RANK_MODES = [
-  { value: 'points', label: 'Won points' },
-  { value: 'wins', label: 'Number of wins' },
-  { value: 'diff', label: 'Point difference' },
-];
+const RANK_MODES = ['points', 'wins', 'diff'];
 
-const TIE_BREAKS = [
-  { value: 'wins', label: 'Number of wins' },
-  { value: 'diff', label: 'Point difference' },
-];
+const TIE_BREAKS = ['wins', 'diff'];
 
 function newDraft() {
   return {
@@ -22,7 +16,7 @@ function newDraft() {
     players: [],
     teams: [],
     points: { mode: 'perRound', perRound: '32', win: '3', tie: '1', loss: '0' },
-    title: `Americano ${new Date().toLocaleDateString()}`,
+    title: tr('wizard.defaultTitle', { date: new Date().toLocaleDateString(currentLanguage()) }),
     rankMode: 'points',
     tieBreak: 'diff',
   };
@@ -43,8 +37,8 @@ export function renderWizard(root) {
 
   root.append(
     titleBar({
-      title: 'Add Tournament',
-      right: [iconButton('close', 'Discard tournament', abort)],
+      title: tr('wizard.title'),
+      right: [iconButton('close', tr('wizard.discard'), abort)],
     }),
     h('div', { class: 'stepper-wrap' }, stepper),
     body,
@@ -52,9 +46,9 @@ export function renderWizard(root) {
 
   async function abort() {
     const confirmed = await confirmDialog({
-      title: 'Discard tournament?',
-      message: 'Do you really want to throw away the configured tournament?',
-      okLabel: 'Discard',
+      title: tr('wizard.discardTitle'),
+      message: tr('wizard.discardMessage'),
+      okLabel: tr('wizard.discardConfirm'),
     });
     if (confirmed) {
       clearDraft();
@@ -71,12 +65,12 @@ export function renderWizard(root) {
 
   function renderStepper() {
     stepper.replaceChildren(
-      ...STEPS.map((label, i) => {
+      ...STEPS.map((key, i) => {
         const n = i + 1;
         const state = n < draft.step ? 'done' : n === draft.step ? 'active' : '';
         return h('li', { class: `step ${state}` },
           h('span', { class: 'step-dot' }, n < draft.step ? icon('check') : String(n)),
-          h('span', { class: 'step-label' }, label),
+          h('span', { class: 'step-label' }, tr(key)),
         );
       }),
     );
@@ -91,10 +85,10 @@ export function renderWizard(root) {
     else renderFormat();
   }
 
-  function navButtons({ onBack, nextLabel = 'Next', onNext, nextEnabled = true, nextClass = 'btn-primary' }) {
+  function navButtons({ onBack, nextLabel = tr('common.next'), onNext, nextEnabled = true, nextClass = 'btn-primary' }) {
     const next = h('button', { type: 'button', class: `btn ${nextClass}`, onClick: onNext, disabled: !nextEnabled }, nextLabel);
     const bar = h('div', { class: 'wizard-nav' },
-      h('button', { type: 'button', class: 'btn btn-secondary', onClick: onBack }, 'Back'),
+      h('button', { type: 'button', class: 'btn btn-secondary', onClick: onBack }, tr('common.back')),
       next,
     );
     return { bar, next };
@@ -105,11 +99,11 @@ export function renderWizard(root) {
   function renderFormat() {
     draft.step = 1;
     const options = [
-      { value: 'classic', description: 'Everyone partners with every other player exactly once. Partners change every round.' },
-      { value: 'team', description: 'Fixed teams of two. Every team plays once against every other team.' },
+      { value: 'classic', description: tr('wizard.formatClassicDescription') },
+      { value: 'team', description: tr('wizard.formatTeamDescription') },
     ];
     body.append(
-      h('h2', { class: 'section-title' }, 'Select the tournament format'),
+      h('h2', { class: 'section-title' }, tr('wizard.formatTitle')),
       h('div', { class: 'choice-list' },
         options.map((o) =>
           h('button', {
@@ -122,7 +116,7 @@ export function renderWizard(root) {
               goTo(2);
             },
           },
-            h('span', { class: 'choice-title' }, FORMAT_LABELS[o.value]),
+            h('span', { class: 'choice-title' }, tr(`format.${o.value}`)),
             h('span', { class: 'choice-description' }, o.description),
           ),
         ),
@@ -151,7 +145,7 @@ export function renderWizard(root) {
     const count = Math.floor(draft.players.length / 2);
     draft.teams = draft.teams.slice(0, count);
     while (draft.teams.length < count) {
-      draft.teams.push({ id: uid(), name: `Team ${draft.teams.length + 1}`, playerIds: [null, null] });
+      draft.teams.push({ id: uid(), name: tr('common.teamNumber', { number: draft.teams.length + 1 }), playerIds: [null, null] });
     }
     for (const team of draft.teams) {
       team.playerIds = team.playerIds.map((id) => (id && ids.has(id) ? id : null));
@@ -162,7 +156,7 @@ export function renderWizard(root) {
     const nameInput = h('input', {
       type: 'text',
       class: 'input',
-      placeholder: 'Player name',
+      placeholder: tr('wizard.playerName'),
       maxlength: '40',
       autocomplete: 'off',
       onKeydown: (e) => { if (e.key === 'Enter') { e.preventDefault(); addPlayer(); } },
@@ -176,11 +170,11 @@ export function renderWizard(root) {
     function addPlayer() {
       const name = nameInput.value.trim();
       if (!name) {
-        error.textContent = 'Please enter a name.';
+        error.textContent = tr('wizard.nameRequired');
         return;
       }
       if (draft.players.some((p) => p.name.toLowerCase() === name.toLowerCase())) {
-        error.textContent = `"${name}" has already been added.`;
+        error.textContent = tr('wizard.nameDuplicate', { name });
         return;
       }
       draft.players.push({ id: uid(), name });
@@ -206,13 +200,15 @@ export function renderWizard(root) {
     function updateState() {
       const n = draft.players.length;
       if (!playersValid()) {
-        hint.textContent = `The player count has to be divisible by 4 and at least 4. Currently: ${n}`;
+        hint.textContent = tr('wizard.playerCountInvalid', { count: n });
         hint.className = 'hint hint-warning';
       } else if (!teamsValid()) {
-        hint.textContent = 'Assign two players and a unique name to every team.';
+        hint.textContent = tr('wizard.teamsInvalid');
         hint.className = 'hint hint-warning';
       } else {
-        hint.textContent = `${n} players${draft.format === 'team' ? `, ${n / 2} teams` : ''}. Ready to continue.`;
+        hint.textContent = draft.format === 'team'
+          ? tr('wizard.readyTeam', { players: n, teams: n / 2 })
+          : tr('wizard.readyClassic', { players: n });
         hint.className = 'hint hint-ok';
       }
       nav.next.disabled = !(playersValid() && teamsValid());
@@ -220,18 +216,18 @@ export function renderWizard(root) {
 
     function renderTable() {
       if (draft.players.length === 0) {
-        tableWrap.replaceChildren(h('p', { class: 'muted empty-inline' }, 'No players added yet.'));
+        tableWrap.replaceChildren(h('p', { class: 'muted empty-inline' }, tr('wizard.noPlayers')));
         return;
       }
       tableWrap.replaceChildren(
         h('table', { class: 'table' },
-          h('thead', {}, h('tr', {}, h('th', { class: 'col-num' }, '#'), h('th', {}, 'Name'), h('th', { class: 'col-action' }, ''))),
+          h('thead', {}, h('tr', {}, h('th', { class: 'col-num' }, '#'), h('th', {}, tr('wizard.nameColumn')), h('th', { class: 'col-action' }, ''))),
           h('tbody', {},
             draft.players.map((p, i) =>
               h('tr', {},
                 h('td', { class: 'col-num muted' }, String(i + 1)),
                 h('td', {}, p.name),
-                h('td', { class: 'col-action' }, iconButton('trash', `Remove ${p.name}`, () => removePlayer(p.id), 'icon-btn-danger')),
+                h('td', { class: 'col-action' }, iconButton('trash', tr('wizard.removePlayer', { name: p.name }), () => removePlayer(p.id), 'icon-btn-danger')),
               ),
             ),
           ),
@@ -252,7 +248,7 @@ export function renderWizard(root) {
         const options = draft.players.filter((p) => p.id === current || !assigned.has(p.id));
         return h('select', {
           class: 'input select',
-          'aria-label': `${team.name} player ${slot + 1}`,
+          'aria-label': tr('wizard.teamPlayerLabel', { team: team.name, number: slot + 1 }),
           onChange: (e) => {
             team.playerIds[slot] = e.target.value || null;
             persist();
@@ -260,15 +256,15 @@ export function renderWizard(root) {
             updateState();
           },
         },
-          h('option', { value: '', selected: !current }, '— select player —'),
+          h('option', { value: '', selected: !current }, tr('wizard.selectPlayer')),
           options.map((p) => h('option', { value: p.id, selected: p.id === current }, p.name)),
         );
       };
 
       teamsWrap.replaceChildren(
         h('div', { class: 'section-head' },
-          h('h2', { class: 'section-title' }, 'Teams'),
-          h('button', { type: 'button', class: 'btn btn-secondary btn-small', onClick: randomPairing }, icon('shuffle'), 'Random pairing'),
+          h('h2', { class: 'section-title' }, tr('wizard.teamsTitle')),
+          h('button', { type: 'button', class: 'btn btn-secondary btn-small', onClick: randomPairing }, icon('shuffle'), tr('wizard.randomPairing')),
         ),
         h('div', { class: 'team-list' },
           draft.teams.map((team, i) =>
@@ -278,8 +274,8 @@ export function renderWizard(root) {
                 class: 'input team-name',
                 value: team.name,
                 maxlength: '30',
-                placeholder: `Team ${i + 1}`,
-                'aria-label': `Name of team ${i + 1}`,
+                placeholder: tr('common.teamNumber', { number: i + 1 }),
+                'aria-label': tr('wizard.teamNameLabel', { number: i + 1 }),
                 onInput: (e) => {
                   team.name = e.target.value;
                   persist();
@@ -311,10 +307,10 @@ export function renderWizard(root) {
     });
 
     body.append(
-      h('h2', { class: 'section-title' }, 'Players'),
+      h('h2', { class: 'section-title' }, tr('wizard.playersTitle')),
       h('div', { class: 'add-row' },
         nameInput,
-        h('button', { type: 'button', class: 'btn btn-primary', onClick: addPlayer }, icon('plus'), 'Add'),
+        h('button', { type: 'button', class: 'btn btn-primary', onClick: addPlayer }, icon('plus'), tr('common.add')),
       ),
       error,
       tableWrap,
@@ -336,13 +332,13 @@ export function renderWizard(root) {
     const p = draft.points;
     if (p.mode === 'perRound') {
       const v = parseIntStrict(p.perRound);
-      return Number.isInteger(v) && v >= 1 && v <= 999 ? [] : ['Points per round must be a whole number between 1 and 999.'];
+      return Number.isInteger(v) && v >= 1 && v <= 999 ? [] : [tr('wizard.perRoundInvalid')];
     }
     const invalid = ['win', 'tie', 'loss'].filter((k) => {
       const v = parseIntStrict(p[k]);
       return !(Number.isInteger(v) && v <= 999);
     });
-    return invalid.length ? ['Win, tie and loss points must be whole numbers between 0 and 999.'] : [];
+    return invalid.length ? [tr('wizard.wtlInvalid')] : [];
   }
 
   function renderPoints() {
@@ -404,15 +400,15 @@ export function renderWizard(root) {
     });
 
     body.append(
-      h('h2', { class: 'section-title' }, 'Points'),
+      h('h2', { class: 'section-title' }, tr('wizard.pointsTitle')),
       h('div', { class: 'choice-list' },
-        modeCard('perRound', 'Points per round', 'Both scores of a match always add up to this number.', [
-          numberInput('perRound', 'Points per round (1–999)', 1),
+        modeCard('perRound', tr('wizard.perRoundTitle'), tr('wizard.perRoundDescription'), [
+          numberInput('perRound', tr('wizard.perRoundInput'), 1),
         ]),
-        modeCard('wtl', 'Win / Tie / Loss Points', 'Points granted to each player for the result of a match.', [
-          numberInput('win', 'Win', 0),
-          numberInput('tie', 'Tie', 0),
-          numberInput('loss', 'Loss', 0),
+        modeCard('wtl', tr('wizard.wtlTitle'), tr('wizard.wtlDescription'), [
+          numberInput('win', tr('wizard.win'), 0),
+          numberInput('tie', tr('wizard.tie'), 0),
+          numberInput('loss', tr('wizard.loss'), 0),
         ]),
       ),
       error,
@@ -426,53 +422,43 @@ export function renderWizard(root) {
   function renderSettings() {
     const error = h('p', { class: 'field-error' });
 
-    const radioGroup = (name, legend, options, key) =>
-      h('fieldset', { class: 'fieldset' },
-        h('legend', { class: 'field-label' }, legend),
-        h('div', { class: 'segmented' },
-          options.map((o) =>
-            h('label', { class: 'segment' },
-              h('input', {
-                type: 'radio',
-                name,
-                value: o.value,
-                checked: draft[key] === o.value,
-                onChange: () => { draft[key] = o.value; persist(); },
-              }),
-              h('span', {}, o.label),
-            ),
-          ),
-        ),
-      );
+    const rankGroup = (name, legend, modes, key) =>
+      radioGroup({
+        name,
+        legend,
+        options: modes.map((value) => ({ value, label: tr(`rank.${value}`) })),
+        value: draft[key],
+        onChange: (value) => { draft[key] = value; persist(); },
+      });
 
     const updateState = () => {
       const valid = draft.title.trim().length > 0;
-      error.textContent = valid ? '' : 'Please enter a title.';
+      error.textContent = valid ? '' : tr('wizard.titleRequired');
       nav.next.disabled = !valid;
     };
 
     const nav = navButtons({
       onBack: () => goTo(3),
-      nextLabel: 'Create tournament',
+      nextLabel: tr('wizard.create'),
       onNext: create,
     });
 
     body.append(
-      h('h2', { class: 'section-title' }, 'Settings'),
+      h('h2', { class: 'section-title' }, tr('wizard.settingsTitle')),
       h('label', { class: 'field' },
-        h('span', { class: 'field-label' }, 'Title'),
+        h('span', { class: 'field-label' }, tr('wizard.titleLabel')),
         h('input', {
           type: 'text',
           class: 'input',
           value: draft.title,
           maxlength: '60',
-          placeholder: 'Tournament title',
+          placeholder: tr('wizard.titlePlaceholder'),
           onInput: (e) => { draft.title = e.target.value; persist(); updateState(); },
         }),
       ),
       error,
-      radioGroup('rank-mode', 'Rank mode', RANK_MODES, 'rankMode'),
-      radioGroup('tie-break', 'Tie break', TIE_BREAKS, 'tieBreak'),
+      rankGroup('rank-mode', tr('wizard.rankMode'), RANK_MODES, 'rankMode'),
+      rankGroup('tie-break', tr('wizard.tieBreak'), TIE_BREAKS, 'tieBreak'),
       nav.bar,
     );
     updateState();

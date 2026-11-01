@@ -2,6 +2,7 @@ const KEYS = {
   tournaments: 'ptm.tournaments',
   draft: 'ptm.draft',
   theme: 'ptm.theme',
+  language: 'ptm.language',
 };
 
 function readJson(key, fallback) {
@@ -60,6 +61,14 @@ export function loadTheme() {
 
 export function saveTheme(theme) {
   localStorage.setItem(KEYS.theme, theme);
+}
+
+export function loadLanguage() {
+  return localStorage.getItem(KEYS.language);
+}
+
+export function saveLanguage(language) {
+  localStorage.setItem(KEYS.language, language);
 }
 
 export function uid() {

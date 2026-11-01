@@ -1,19 +1,16 @@
-import { loadTournaments, loadTheme, saveTheme } from '../storage.js';
-import { h, icon, iconButton, titleBar, navigate, applyTheme, FORMAT_LABELS } from '../ui.js';
+import { loadTournaments } from '../storage.js';
+import { tr } from '../i18n.js';
+import { h, iconButton, titleBar, navigate } from '../ui.js';
 import { allMatches, isFinished } from '../ranking.js';
 
 export function renderList(root) {
-  const themeButton = iconButton(loadTheme() === 'dark' ? 'sun' : 'moon', 'Toggle light / dark mode', () => {
-    const next = loadTheme() === 'dark' ? 'light' : 'dark';
-    saveTheme(next);
-    applyTheme(next);
-    themeButton.replaceChildren(icon(next === 'dark' ? 'sun' : 'moon'));
-  });
-
   root.append(
     titleBar({
-      title: 'Tournaments',
-      right: [themeButton, iconButton('plus', 'Add tournament', () => navigate('#/new'), 'icon-btn-primary')],
+      title: tr('list.title'),
+      right: [
+        iconButton('gear', tr('list.settings'), () => navigate('#/settings')),
+        iconButton('plus', tr('list.addTournament'), () => navigate('#/new'), 'icon-btn-primary'),
+      ],
     }),
   );
 
@@ -23,8 +20,8 @@ export function renderList(root) {
   if (tournaments.length === 0) {
     main.append(
       h('div', { class: 'empty-state' },
-        h('p', { class: 'empty-title' }, 'No tournaments yet'),
-        h('p', { class: 'muted' }, 'Tap "+" to create your first tournament.'),
+        h('p', { class: 'empty-title' }, tr('list.emptyTitle')),
+        h('p', { class: 'muted' }, tr('list.emptyHint')),
       ),
     );
   } else {
@@ -36,6 +33,8 @@ export function renderList(root) {
 function tournamentCard(t) {
   const finished = isFinished(t);
   const open = () => navigate(`#/t/${encodeURIComponent(t.id)}/lb`);
+  const playerCount = t.players.length;
+  const matchCount = allMatches(t).length;
   return h('article', {
     class: 'card card-clickable tournament-card',
     tabindex: '0',
@@ -45,12 +44,12 @@ function tournamentCard(t) {
   },
     h('div', { class: 'tournament-card-head' },
       h('h2', { class: 'tournament-card-title' }, t.title),
-      h('span', { class: `badge ${finished ? 'badge-finished' : 'badge-open'}` }, finished ? 'Finished' : 'Open'),
+      h('span', { class: `badge ${finished ? 'badge-finished' : 'badge-open'}` }, tr(finished ? 'status.finished' : 'status.open')),
     ),
-    h('div', { class: 'tournament-card-format' }, FORMAT_LABELS[t.format] || t.format),
+    h('div', { class: 'tournament-card-format' }, tr(`format.${t.format}`)),
     h('div', { class: 'tournament-card-stats' },
-      h('span', {}, h('strong', {}, String(t.players.length)), ' players'),
-      h('span', {}, h('strong', {}, String(allMatches(t).length)), ' matches'),
+      h('span', {}, h('strong', {}, String(playerCount)), ' ', tr('list.players', { count: playerCount })),
+      h('span', {}, h('strong', {}, String(matchCount)), ' ', tr('list.matches', { count: matchCount })),
     ),
   );
 }

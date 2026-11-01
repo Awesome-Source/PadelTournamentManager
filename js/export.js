@@ -1,4 +1,5 @@
 import { computeLeaderboard, formatDiff } from './ranking.js';
+import { tr } from './i18n.js';
 
 const CSV_MIME = 'text/csv;charset=utf-8';
 // Lets Excel detect UTF-8, so names with non-ASCII characters stay intact.
@@ -18,14 +19,14 @@ function toCsv(rows) {
 export function leaderboardCsv(tournament) {
   const isTeam = tournament.format === 'team';
   const header = [
-    'Rank',
-    isTeam ? 'Team' : 'Player',
-    isTeam ? 'Members' : null,
-    'Wins',
-    'Ties',
-    'Losses',
-    'Points',
-    'Point difference',
+    tr('csv.rank'),
+    tr(isTeam ? 'common.team' : 'common.player'),
+    isTeam ? tr('csv.members') : null,
+    tr('csv.wins'),
+    tr('csv.ties'),
+    tr('csv.losses'),
+    tr('csv.points'),
+    tr('csv.diff'),
   ];
   const rows = computeLeaderboard(tournament).map((r) => [
     r.rank,
@@ -46,16 +47,27 @@ export function matchesCsv(tournament) {
   const teamNames = new Map(tournament.teams.map((t) => [t.id, t.name]));
   const players = (ids) => ids.map((id) => playerNames.get(id) || '?');
 
-  const header = isTeam
-    ? ['Round', 'Match', 'Team 1', 'Team 1 Player 1', 'Team 1 Player 2', 'Team 2', 'Team 2 Player 1', 'Team 2 Player 2', 'Score 1', 'Score 2']
-    : ['Round', 'Match', 'Team 1 Player 1', 'Team 1 Player 2', 'Team 2 Player 1', 'Team 2 Player 2', 'Score 1', 'Score 2'];
+  const teamNumber = (number) => tr('common.teamNumber', { number });
+  const teamPlayer = (team, player) => tr('csv.teamPlayer', { team, player });
+  const header = [
+    tr('csv.round'),
+    tr('csv.match'),
+    ...(isTeam ? [teamNumber(1)] : []),
+    teamPlayer(1, 1),
+    teamPlayer(1, 2),
+    ...(isTeam ? [teamNumber(2)] : []),
+    teamPlayer(2, 1),
+    teamPlayer(2, 2),
+    tr('csv.score', { number: 1 }),
+    tr('csv.score', { number: 2 }),
+  ];
   const rows = tournament.rounds.flatMap((round, r) =>
     round.map((match, m) => [
       r + 1,
       m + 1,
-      ...(isTeam ? [teamNames.get(match.team1Id) || 'Team 1'] : []),
+      ...(isTeam ? [teamNames.get(match.team1Id) || teamNumber(1)] : []),
       ...players(match.side1),
-      ...(isTeam ? [teamNames.get(match.team2Id) || 'Team 2'] : []),
+      ...(isTeam ? [teamNames.get(match.team2Id) || teamNumber(2)] : []),
       ...players(match.side2),
       match.score1,
       match.score2,
@@ -71,14 +83,15 @@ export function matchesCsv(tournament) {
 export function leaderboardText(tournament) {
   const lines = computeLeaderboard(tournament).map((r) => {
     const name = r.members.length > 0 ? `${r.name} (${r.members.join(' & ')})` : r.name;
-    const points = `${r.wonPoints} ${r.wonPoints === 1 ? 'point' : 'points'}`;
-    return `${r.rank}. ${name}: ${points}, ${r.wins}W ${r.ties}T ${r.losses}L, ${formatDiff(r.diff)}`;
+    const points = tr('results.points', { count: r.wonPoints });
+    const record = tr('results.record', { wins: r.wins, ties: r.ties, losses: r.losses });
+    return `${r.rank}. ${name}: ${points}, ${record}, ${formatDiff(r.diff)}`;
   });
   return [tournament.title, '', ...lines].join('\n');
 }
 
 export function exportFileName(tournament, suffix) {
-  const title = tournament.title.replace(/[\\/:*?"<>|\u0000-\u001f]/g, '').trim() || 'tournament';
+  const title = tournament.title.replace(/[\\/:*?"<>|\u0000-\u001f]/g, '').trim() || tr('export.fileFallback');
   return `${title} - ${suffix}.csv`;
 }
 

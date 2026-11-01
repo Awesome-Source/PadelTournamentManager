@@ -13,7 +13,11 @@ A static web app for running padel **Americano** tournaments. It has no backend:
 - **Live leaderboard.** Choose the rank mode (won points, number of wins or point difference) and a tie break rule.
 - **Winner shout out.** Once a tournament is finished, the leaderboard congratulates the winner below a trophy.
 - **Export for finished tournaments.** Download the leaderboard or all matches as CSV, or copy the leaderboard as plain text to paste into a messenger.
-- **Dark mode** (default) and **light mode**.
+- **Settings page** for the appearance, **dark mode** (default) or **light mode**, and the language, **English** (default) or **German**.
+
+## Translations
+
+All text visible to the user is in [js/i18n.js](js/i18n.js). To add a language, copy the `en` block in that file and translate the values. The new language then appears on the settings page.
 
 ## Run locally
 
